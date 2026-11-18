@@ -73,9 +73,11 @@ study landing page (Figma 69-1190, 69-1452), which only gets data through
 
 | Gap | Priority | Notes |
 |---|---|---|
-| Data-use consent | **Must-have** | The design has an "I agree to my data being used" checkbox. Consent must be stored, and nothing in the contract holds it. |
+| Data-use consent | **Must-have** | The landing design has an "I agree to my data being used" checkbox, but it belongs on the onboarding form (C3), where the participant actually applies. Consent must be stored with the application, and nothing in the contract holds it. |
 | Researcher display name | — | "Run by [researcher name]". The RPC deliberately returns no researcher data. |
 | Maximum reward | — | "Earn up to [max reward]". No such field on `studies` or in the RPC. |
 | Recruitment closed date | — | "Recruitment closed on [date]". The RPC returns no date. |
 | Password reset (route + flow) | — | The log-in design (69-1309) has "Forgot password?", but the contract has no reset route or flow. Left out of `/login`. |
 | `?code=` on `/login` | — | Keeps source tracking for existing users. Already used by the frontend; needs adding to contract §7, which only lists `?code=` on `/register`. |
+| Study quotas + quota progress | — | The eligibility questions (age band, gender, location) are ordinary onboarding questions. The researcher study dashboard design shows quota progress by those answers; there are no quota columns in `studies` and nothing returns quota progress. |
+| Researcher contact email | — | The "group full" result (69-1556) shows the researcher's email. `get_study_by_source_code` deliberately returns no researcher data, so C3 shows the message without it. |

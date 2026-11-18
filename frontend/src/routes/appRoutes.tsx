@@ -5,7 +5,7 @@
 import type { RouteObject } from 'react-router-dom'
 import { ROUTES } from '@contract/routes'
 import { AppShell } from '@/app/AppShell'
-import { RedirectIfSignedIn, RequireRole } from '@/features/auth/guards'
+import { RedirectIfSignedIn, RequireApprovedEnrolment, RequirePendingEnrolment, RequireRole } from '@/features/auth/guards'
 import SettingsPage from '@/pages/account/SettingsPage'
 import AdminOverviewPage from '@/pages/admin/AdminOverviewPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
@@ -46,10 +46,19 @@ export const appRoutes: RouteObject[] = [
         element: <RequireRole roles={['participant']} />,
         children: [
           { path: ROUTES.onboarding(':studyId'), element: <OnboardingPage /> },
-          { path: ROUTES.participant, element: <ParticipantDashboardPage /> },
-          { path: ROUTES.participantTask(':taskId'), element: <ParticipantTaskPage /> },
-          { path: ROUTES.participantRewards, element: <ParticipantRewardsPage /> },
-          { path: ROUTES.participantPending, element: <ParticipantPendingPage /> },
+          {
+            // R-R5: waiting for approval → kept on the pending screen
+            element: <RequireApprovedEnrolment />,
+            children: [
+              { path: ROUTES.participant, element: <ParticipantDashboardPage /> },
+              { path: ROUTES.participantTask(':taskId'), element: <ParticipantTaskPage /> },
+              { path: ROUTES.participantRewards, element: <ParticipantRewardsPage /> },
+            ],
+          },
+          {
+            element: <RequirePendingEnrolment />,
+            children: [{ path: ROUTES.participantPending, element: <ParticipantPendingPage /> }],
+          },
         ],
       },
 

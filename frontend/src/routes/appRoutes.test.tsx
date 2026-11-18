@@ -45,7 +45,7 @@ describe('role guards (A3)', () => {
   describe('right role', () => {
     it.each<[MockSession, string, string]>([
       ['participant', ROUTES.participant, 'My dashboard'],
-      ['participant', ROUTES.onboarding('s1'), 'Onboarding questionnaire'],
+      ['participant', ROUTES.onboarding('11111111-1111-1111-1111-111111111111'), 'Tell us about you'],
       ['researcher', ROUTES.researcher, 'My studies'],
       ['researcher', ROUTES.researcherStudyParticipants('s1'), 'Participants'],
       ['admin', ROUTES.admin, 'Admin overview'],

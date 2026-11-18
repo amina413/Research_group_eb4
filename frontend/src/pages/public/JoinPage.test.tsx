@@ -33,10 +33,12 @@ describe('study landing page /join/:code (C1, C2)', () => {
       expect(joinLink()).not.toBeInTheDocument()
     })
 
-    it('a signed-in participant gets no join link yet (C3)', async () => {
+    it('a signed-in participant gets a join link straight to onboarding (C3)', async () => {
       renderAt(ROUTES.join('LIBPOST1'), 'participant')
-      expect(await screen.findByText(/You're already signed in/)).toBeInTheDocument()
-      expect(joinLink()).not.toBeInTheDocument()
+      expect(await screen.findByRole('link', { name: 'Join this study' })).toHaveAttribute(
+        'href',
+        ROUTES.onboarding('11111111-1111-1111-1111-111111111111'),
+      )
     })
   })
 

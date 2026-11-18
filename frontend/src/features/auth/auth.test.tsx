@@ -65,12 +65,12 @@ describe('register (A1)', () => {
     expect(getMockUserId()).toBeNull()
   })
 
-  it('creates a participant, signs them in and keeps ?code= for C3', async () => {
+  it('creates a participant, signs them in and continues to the study\'s onboarding with ?code= kept', async () => {
     const router = renderAt(`${ROUTES.register}?code=LIBPOST1`, 'signed_out')
     await fillRegister({ name: 'Sam Smith', email: 'sam@example.com', password: 'longenough1', confirm: 'longenough1' })
 
-    expect(await h1('My dashboard')).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe(ROUTES.participant)
+    expect(await h1('Tell us about you')).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe(ROUTES.onboarding('11111111-1111-1111-1111-111111111111'))
     expect(getPendingSourceCode()).toBe('LIBPOST1')
     expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument()
     expect(getMockUserId()).not.toBeNull()
@@ -82,6 +82,14 @@ describe('register (A1)', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('An account with this email already exists')
     expect(router.state.location.pathname).toBe(ROUTES.register)
+  })
+
+  it('without a code, a new participant lands in their own area', async () => {
+    const router = renderAt(ROUTES.register, 'signed_out')
+    await fillRegister({ name: 'Sam Smith', email: 'sam@example.com', password: 'longenough1', confirm: 'longenough1' })
+
+    expect(await h1('My dashboard')).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe(ROUTES.participant)
   })
 
   it('passes ?code= on to the log-in link', async () => {

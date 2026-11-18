@@ -8,6 +8,7 @@ import type { StudyLandingInfo } from '@contract/database.types'
 import { ROUTES } from '@contract/routes'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { setPendingSourceCode } from '@/features/auth/pendingSourceCode'
 import { useCurrentProfile } from '@/features/auth/useCurrentProfile'
 import { landingView } from '@/features/studies/landingView'
 import { useStudyLanding } from '@/features/studies/useStudyLanding'
@@ -33,8 +34,8 @@ function InfoPanel({ title, children }: { title: string; children: React.ReactNo
   )
 }
 
-/** Join card for a recruiting study. Joining while signed in comes with C3. */
-function JoinCard({ code, spotsLeft }: { code: string; spotsLeft: number }) {
+/** Join card for a recruiting study. Signed out → sign up (keeps ?code=); participant → onboarding (C3). */
+function JoinCard({ code, studyId, spotsLeft }: { code: string; studyId: string; spotsLeft: number }) {
   const { data: profile, isPending } = useCurrentProfile()
   const registerHref = `${ROUTES.register}?code=${encodeURIComponent(code)}`
 
@@ -49,9 +50,11 @@ function JoinCard({ code, spotsLeft }: { code: string; spotsLeft: number }) {
             <Link to={registerHref}>Join this study</Link>
           </Button>
         ) : profile?.role === 'participant' ? (
-          <p className="text-muted-foreground">
-            You're already signed in. Joining a study from your account is coming soon.
-          </p>
+          <Button asChild>
+            <Link to={ROUTES.onboarding(studyId)} onClick={() => setPendingSourceCode(code)}>
+              Join this study
+            </Link>
+          </Button>
         ) : (
           <p className="font-bold">This page is for participants.</p>
         )}
@@ -135,7 +138,7 @@ export default function JoinPage() {
             )}
           </div>
           <aside aria-label="Join this study">
-            <JoinCard code={code} spotsLeft={study.spots_left} />
+            <JoinCard code={code} studyId={study.study_id} spotsLeft={study.spots_left} />
           </aside>
         </div>
       </article>

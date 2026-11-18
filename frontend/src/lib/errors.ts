@@ -18,3 +18,16 @@ export class AuthError extends Error {
     this.code = code
   }
 }
+
+export type ApplyErrorCode = 'study_not_recruiting' | 'already_enrolled'
+
+/** Expected apply_to_study failures (R-R3, R-R4). The UI picks its message from `code`. */
+export class ApplyError extends Error {
+  readonly code: ApplyErrorCode
+
+  constructor(code: ApplyErrorCode) {
+    super(code)
+    this.name = 'ApplyError'
+    this.code = code
+  }
+}
