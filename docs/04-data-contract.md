@@ -39,10 +39,9 @@ Spelling: British — `enrolment`, `enrolments` (one L). Do **not** mix with `en
 | `task_type` | `onboarding`, `questionnaire`, `survey`, `daily_task` | `tasks.task_type` | Proposed |
 | `task_frequency` | `once`, `daily`, `weekly` | `tasks.frequency` | Proposed |
 | `question_type` | `short_text`, `long_text`, `single_choice`, `multi_choice`, `scale`, `number`, `yes_no` | `task_questions.question_type` | Proposed |
-| `streak_status` | `active`, `grace`, `broken` | `get_participation_summary()` output | Proposed |
 | `reward_type` | `voucher`, `badge`, `device` | `rewards.reward_type` | Proposed |
 | `reward_claim_status` | `locked`, `unlocked`, `issued` | `reward_claims.status` | Proposed |
-| `notification_type` | `enrolment_approved`, `enrolment_rejected`, `task_due`, `streak_grace`, `streak_broken`, `reward_unlocked`, `study_full`, `general` | `notifications.type` | Proposed |
+| `notification_type` | `enrolment_approved`, `enrolment_rejected`, `task_due`, `falling_behind`, `reward_unlocked`, `study_full`, `general` | `notifications.type` | Proposed |
 
 ---
 
@@ -72,8 +71,9 @@ Spelling: British — `enrolment`, `enrolments` (one L). Do **not** mix with `en
 | `target_participants` | `integer` | no | — | > 0. Recruitment stops at this number | Proposed |
 | `approved_count` | `integer` | no | `0` | Maintained by backend trigger, read-only for FE | Proposed |
 | `status` | `study_status` | no | `'draft'` | | Proposed |
-| `start_date` | `date` | yes | — | | Proposed |
-| `end_date` | `date` | yes | — | | Proposed |
+| `start_date` | `date` | yes | — | Required before publishing (R-M3) | Proposed |
+| `end_date` | `date` | yes | — | Required before publishing (R-M3) | Proposed |
+| `payment_threshold_percent` | `integer` | no | `0` | 0–100 in steps of 10. No reward below this completion % (R-M6). Locked once published (R-M7) | Proposed |
 | `created_at` | `timestamptz` | no | `now()` | | Proposed |
 | `updated_at` | `timestamptz` | no | `now()` | | Proposed |
 
@@ -98,8 +98,7 @@ Spelling: British — `enrolment`, `enrolments` (one L). Do **not** mix with `en
 | `description` | `text` | yes | — | | Proposed |
 | `task_type` | `task_type` | no | — | Exactly one `onboarding` task per study | Proposed |
 | `frequency` | `task_frequency` | no | `'once'` | `daily_task` → usually `daily` | Proposed |
-| `points` | `integer` | no | `10` | Awarded on completion | Proposed |
-| `counts_towards_streak` | `boolean` | no | `true` | `false` for onboarding | Proposed |
+| `counts_towards_progress` | `boolean` | no | `true` | `false` for onboarding. Only these tasks count in `completion_percent` (R-M1) | Proposed |
 | `is_active` | `boolean` | no | `true` | | Proposed |
 | `opens_at` | `timestamptz` | yes | — | | Proposed |
 | `closes_at` | `timestamptz` | yes | — | | Proposed |
@@ -126,7 +125,6 @@ Spelling: British — `enrolment`, `enrolments` (one L). Do **not** mix with `en
 | `participant_id` | `uuid` | no | — | FK → `profiles.id` | Proposed |
 | `source_id` | `uuid` | yes | — | FK → `recruitment_sources.id`. How they found the study | Proposed |
 | `status` | `enrolment_status` | no | `'pending'` | | Proposed |
-| `total_points` | `integer` | no | `0` | Maintained by backend, read-only for FE | Proposed |
 | `applied_at` | `timestamptz` | no | `now()` | | Proposed |
 | `reviewed_at` | `timestamptz` | yes | — | | Proposed |
 | `reviewed_by` | `uuid` | yes | — | FK → `profiles.id` | Proposed |
@@ -147,7 +145,7 @@ Unique: (`study_id`, `participant_id`).
 
 Unique: (`task_id`, `enrolment_id`, `due_date`) — one response per task per period.
 
-### 2.8 `rewards` — milestones defined per study
+### 2.8 `rewards` — one reward per 10% completion milestone, per study
 
 | Column | Type | Null | Default | Notes | Status |
 |---|---|---|---|---|---|
@@ -155,10 +153,12 @@ Unique: (`task_id`, `enrolment_id`, `due_date`) — one response per task per pe
 | `study_id` | `uuid` | no | — | FK → `studies.id` (cascade delete) | Proposed |
 | `title` | `text` | no | — | e.g. "£10 voucher" | Proposed |
 | `description` | `text` | yes | — | | Proposed |
-| `reward_type` | `reward_type` | no | — | `device` = keep the wearable (top reward) | Proposed |
-| `level_required` | `integer` | no | — | Level at which it unlocks | Proposed |
-| `requires_active_streak` | `boolean` | no | `false` | If true, only unlocks while streak is `active` | Proposed |
+| `reward_type` | `reward_type` | no | — | `device` = keep the wearable; only at `completion_percent = 100` (R-M5) | Proposed |
+| `completion_percent` | `integer` | no | — | Milestone that unlocks it: 10–100 in steps of 10, and ≥ `studies.payment_threshold_percent` (R-M4, R-M6) | Proposed |
+| `amount_pence` | `integer` | yes | — | Payment **for this step** (not a running total), ≥ 0. Required for `voucher`; null for `badge`; optional for `device` (final payment) | Proposed |
 | `created_at` | `timestamptz` | no | `now()` | | Proposed |
+
+Unique: (`study_id`, `completion_percent`). Locked once the study is published (R-M7).
 
 ### 2.9 `reward_claims`
 
@@ -225,27 +225,36 @@ null
 | `apply_to_study` | `p_study_id uuid, p_source_code text, p_answers jsonb` | `enrolments` row | participant | Creates `pending` enrolment + onboarding response in one go. Fails if study not `recruiting` | Proposed |
 | `approve_enrolment` | `p_enrolment_id uuid` | `enrolments` row | researcher (own study), admin | Sets `approved`, bumps `approved_count`, sets study `full` at target, creates notification | Proposed |
 | `reject_enrolment` | `p_enrolment_id uuid, p_reason text` | `enrolments` row | researcher (own study), admin | Sets `rejected`, creates notification | Proposed |
-| `get_participation_summary` | `p_enrolment_id uuid` | see below | participant (own), researcher (own study), admin | Streak / level / points for dashboard | Proposed |
+| `get_participation_summary` | `p_enrolment_id uuid` | see below | participant (own), researcher (own study), admin | Completion %, earnings and milestones for the dashboard | Proposed |
 | `get_study_stats` | `p_study_id uuid` | `{ applied, pending, approved, rejected, by_source: [{ label, code, count }] }` | researcher (own study), admin | Researcher dashboard + source tracking chart | Proposed |
-| `evaluate_streaks` | none | `void` | pg_cron only | Nightly job: updates streak state, sends grace/broken notifications, unlocks rewards | Proposed |
+| `evaluate_progress` | none | `void` | pg_cron only | Nightly job: unlocks `reward_claims` for milestones reached (R-M8), sends `reward_unlocked` and `falling_behind` notifications (R-M9) | Proposed |
 
-`get_participation_summary` returns:
+`get_participation_summary` returns (example: threshold 30%, £30 at 30% then £10 per step):
 
 ```json
 {
   "enrolment_id": "uuid",
-  "window_days": 14,
-  "expected_count": 14,
-  "completed_count": 12,
-  "participation_rate": 0.857,
-  "streak_status": "active",
-  "grace_days_left": null,
-  "total_points": 340,
-  "current_level": 4,
-  "points_to_next_level": 60,
-  "next_reward": { "reward_id": "uuid", "title": "£10 voucher", "level_required": 5 }
+  "completion_percent": 50,
+  "completed_count": 30,
+  "total_count": 60,
+  "payment_threshold_percent": 30,
+  "earned_pence": 5000,
+  "unlocked_milestones": [
+    { "reward_id": "uuid", "completion_percent": 30, "title": "£30 voucher", "reward_type": "voucher", "amount_pence": 3000, "status": "issued" },
+    { "reward_id": "uuid", "completion_percent": 40, "title": "£10 voucher", "reward_type": "voucher", "amount_pence": 1000, "status": "unlocked" },
+    { "reward_id": "uuid", "completion_percent": 50, "title": "£10 voucher", "reward_type": "voucher", "amount_pence": 1000, "status": "unlocked" }
+  ],
+  "next_milestone": { "reward_id": "uuid", "completion_percent": 60, "title": "£10 voucher", "reward_type": "voucher", "amount_pence": 1000 },
+  "is_behind_schedule": false
 }
 ```
+
+- `completion_percent`: whole number 0–100, rounded down (R-M1, R-M2).
+- `completed_count` / `total_count`: progress-counting task occurrences done / scheduled for this enrolment (R-M2).
+- `earned_pence`: sum of `amount_pence` over `unlocked_milestones` (unlocked + issued). The UI shows it as "£X earned so far" and never adds amounts itself (R-P5).
+- `unlocked_milestones`: claims with `status` `unlocked` or `issued`, ordered by `completion_percent`.
+- `next_milestone`: the lowest milestone not yet reached, or `null` when none is left. Its `amount_pence` is the step payment; the UI may show the running total (`earned_pence + amount_pence`).
+- `is_behind_schedule`: see R-M9.
 
 ---
 
@@ -275,7 +284,7 @@ null
 | `/login` | public | Sign in | Proposed |
 | `/register` | public | Sign up (keeps `?code=` so source is tracked) | Proposed |
 | `/onboarding/:studyId` | participant | Onboarding questionnaire | Proposed |
-| `/participant` | participant | Dashboard: streak, level, rewards, today's tasks | Proposed |
+| `/participant` | participant | Dashboard: progress %, milestones, earnings, today's tasks | Proposed |
 | `/participant/tasks/:taskId` | participant | Complete a task | Proposed |
 | `/participant/rewards` | participant | Rewards / milestones | Proposed |
 | `/participant/pending` | participant | "Waiting for approval" screen | Proposed |
@@ -311,3 +320,4 @@ QR codes encode: `${VITE_APP_URL}/join/${recruitment_sources.code}`.
 | Date | Change | By | Approved by |
 |---|---|---|---|
 | 2026-11-15 | Initial proposed contract | Mina (FE) | — pending backend review |
+| 2026-11-18 | Reward model: completion milestones replace the 80% streak, points and levels. Removed `streak_status` enum, `tasks.points`, `enrolments.total_points`, `rewards.level_required`, `rewards.requires_active_streak`, notification types `streak_grace` / `streak_broken`, RPC `evaluate_streaks`. Added `studies.payment_threshold_percent`, `rewards.completion_percent`, `rewards.amount_pence`, notification type `falling_behind`, RPC `evaluate_progress`. Renamed `tasks.counts_towards_streak` → `counts_towards_progress`. New `get_participation_summary` output. | Mina (FE) | — pending backend review |

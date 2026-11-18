@@ -26,15 +26,13 @@ export type QuestionType =
   | 'scale'
   | 'number'
   | 'yes_no';
-export type StreakStatus = 'active' | 'grace' | 'broken';
 export type RewardType = 'voucher' | 'badge' | 'device';
 export type RewardClaimStatus = 'locked' | 'unlocked' | 'issued';
 export type NotificationType =
   | 'enrolment_approved'
   | 'enrolment_rejected'
   | 'task_due'
-  | 'streak_grace'
-  | 'streak_broken'
+  | 'falling_behind'
   | 'reward_unlocked'
   | 'study_full'
   | 'general';
@@ -61,6 +59,8 @@ export interface StudyRow {
   status: StudyStatus;
   start_date: string | null;
   end_date: string | null;
+  /** 0–100 in steps of 10. No reward below this completion % (R-M6). */
+  payment_threshold_percent: number;
   created_at: string;
   updated_at: string;
 }
@@ -81,8 +81,7 @@ export interface TaskRow {
   description: string | null;
   task_type: TaskType;
   frequency: TaskFrequency;
-  points: number;
-  counts_towards_streak: boolean;
+  counts_towards_progress: boolean;
   is_active: boolean;
   opens_at: string | null;
   closes_at: string | null;
@@ -105,7 +104,6 @@ export interface EnrolmentRow {
   participant_id: string;
   source_id: string | null;
   status: EnrolmentStatus;
-  total_points: number;
   applied_at: string;
   reviewed_at: string | null;
   reviewed_by: string | null;
@@ -127,8 +125,10 @@ export interface RewardRow {
   title: string;
   description: string | null;
   reward_type: RewardType;
-  level_required: number;
-  requires_active_streak: boolean;
+  /** Milestone that unlocks it: 10–100 in steps of 10 (R-M4). */
+  completion_percent: number;
+  /** Payment for this step in pence, not a running total. */
+  amount_pence: number | null;
   created_at: string;
 }
 
@@ -162,18 +162,27 @@ export interface StudyLandingInfo {
   spots_left: number;
 }
 
+/** A milestone reward as returned by get_participation_summary. */
+export interface MilestoneReward {
+  reward_id: string;
+  completion_percent: number;
+  title: string;
+  reward_type: RewardType;
+  amount_pence: number | null;
+}
+
 export interface ParticipationSummary {
   enrolment_id: string;
-  window_days: number;
-  expected_count: number;
+  /** Whole number 0–100, rounded down (R-M1). */
+  completion_percent: number;
   completed_count: number;
-  participation_rate: number;
-  streak_status: StreakStatus;
-  grace_days_left: number | null;
-  total_points: number;
-  current_level: number;
-  points_to_next_level: number;
-  next_reward: { reward_id: string; title: string; level_required: number } | null;
+  total_count: number;
+  payment_threshold_percent: number;
+  /** Sum of amount_pence over unlocked_milestones. Never add amounts in the UI (R-P5). */
+  earned_pence: number;
+  unlocked_milestones: (MilestoneReward & { status: Exclude<RewardClaimStatus, 'locked'> })[];
+  next_milestone: MilestoneReward | null;
+  is_behind_schedule: boolean;
 }
 
 export interface StudyStats {
