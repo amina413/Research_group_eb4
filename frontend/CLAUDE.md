@@ -15,6 +15,8 @@ Framer Motion.
   Never redefine a table type locally.
 - Use `TABLES`, `RPC`, `EDGE_FUNCTIONS` and `ROUTES` constants from `@contract`
   instead of string literals.
+- Dev-only routes under /dev, registered only when import.meta.env.DEV is true,
+  are exempt from the contract and must never be linked from app pages.
 - Never calculate streak status, participation rate, points or levels in the UI.
   Display what `get_participation_summary` returns (rule R-P5).
 
