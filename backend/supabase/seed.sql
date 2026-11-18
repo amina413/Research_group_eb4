@@ -1,0 +1,4 @@
+-- Local seed data. Reuse the same UUIDs as frontend/src/mocks so both sides
+-- see the same test study.
+-- Example study id: 11111111-1111-1111-1111-111111111111
+-- Example source code: LIBPOST1
