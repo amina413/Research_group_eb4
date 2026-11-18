@@ -11,11 +11,13 @@ interface TopNavProps {
   items: NavItem[]
   /** Links pinned to the right, e.g. "Account" or "Log in" / "Sign up". */
   actions?: NavItem[]
+  /** Shows a "Sign out" button after the actions when set. */
+  onSignOut?: () => void
   className?: string
 }
 
 /** Top nav bar (06 §3): logo at left, tabs, actions at right. */
-export function TopNav({ items, actions = [], className }: TopNavProps) {
+export function TopNav({ items, actions = [], onSignOut, className }: TopNavProps) {
   const linkClass =
     'inline-flex h-button items-center rounded-sm px-3 font-bold outline-none hover:bg-primary-foreground/10 focus-visible:ring-3 focus-visible:ring-primary-foreground/60'
 
@@ -44,6 +46,13 @@ export function TopNav({ items, actions = [], className }: TopNavProps) {
               </Link>
             </li>
           ))}
+          {onSignOut && (
+            <li>
+              <button type="button" onClick={onSignOut} className={linkClass}>
+                Sign out
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
     </header>

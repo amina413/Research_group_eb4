@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import type { UserRole } from '@contract/database.types'
 import { ROUTES } from '@contract/routes'
-import { homeForRole, type LoginRedirectState } from './roleHome'
+import { homeForRole, isSafeInternalPath, type LoginRedirectState } from './roleHome'
 import { useCurrentProfile } from './useCurrentProfile'
 import { WrongRole } from './WrongRole'
 
@@ -48,13 +48,21 @@ export function RequireRole({ roles }: RequireRoleProps) {
   return <Outlet />
 }
 
-/** Layout route for /login and /register: a signed-in user goes to their own area. */
+/**
+ * Layout route for /login and /register. A signed-in user (including straight
+ * after logging in) goes back to the page they were trying to reach, if A3
+ * remembered one, otherwise to their own area.
+ */
 export function RedirectIfSignedIn() {
   const { data: profile, isPending, isError } = useCurrentProfile()
+  const location = useLocation()
 
   if (isPending) return <AuthLoading />
   if (isError) return <AuthError />
-  if (profile) return <Navigate to={homeForRole(profile.role)} replace />
+  if (profile) {
+    const from = (location.state as LoginRedirectState | null)?.from
+    return <Navigate to={isSafeInternalPath(from) ? from : homeForRole(profile.role)} replace />
+  }
 
   return <Outlet />
 }

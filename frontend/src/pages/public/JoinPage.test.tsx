@@ -21,7 +21,7 @@ describe('study landing page /join/:code (C1, C2)', () => {
       const router = renderAt(ROUTES.join('LIBPOST1'), 'signed_out')
       ;(await screen.findByRole('link', { name: 'Join this study' })).click()
 
-      expect(await screen.findByRole('heading', { level: 1, name: 'Sign up' })).toBeInTheDocument()
+      expect(await screen.findByRole('heading', { level: 1, name: 'Create your participant account' })).toBeInTheDocument()
       expect(router.state.location.pathname).toBe(ROUTES.register)
       expect(router.state.location.search).toBe('?code=LIBPOST1')
     })

@@ -17,3 +17,8 @@ export function homeForRole(role: UserRole): string {
 export interface LoginRedirectState {
   from?: string
 }
+
+/** Only follow internal paths (blocks `//evil.example` and `https://…`). */
+export function isSafeInternalPath(path: unknown): path is string {
+  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/\\')
+}

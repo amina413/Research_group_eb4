@@ -1,8 +1,9 @@
 import { lazy, Suspense } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { ROUTES } from '@contract/routes'
 import { TopNav, type NavItem } from '@/components/layout/TopNav'
 import { homeForRole } from '@/features/auth/roleHome'
+import { useSignOut } from '@/features/auth/useAuthMutations'
 import { useCurrentProfile } from '@/features/auth/useCurrentProfile'
 
 // Dev-only: not included in production builds, and hidden when real auth is on.
@@ -35,11 +36,25 @@ function navFor(profile: ReturnType<typeof useCurrentProfile>['data']): {
 export function AppShell() {
   const { data: profile } = useCurrentProfile()
   const { items, actions } = navFor(profile)
+  const navigate = useNavigate()
+  const signOut = useSignOut()
+
+  function handleSignOut() {
+    // Leave protected pages first, or their guard would send us to /login.
+    void navigate(ROUTES.home)
+    signOut.mutate()
+  }
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <TopNav items={items} actions={actions} />
-      <main className="mx-auto w-full max-w-content flex-1 px-inset py-8 md:px-inset-lg">
+      <a
+        href="#main"
+        className="sr-only z-50 rounded-sm bg-background px-4 py-2 font-bold text-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring"
+      >
+        Skip to main content
+      </a>
+      <TopNav items={items} actions={actions} onSignOut={profile ? handleSignOut : undefined} />
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-content flex-1 px-inset py-8 outline-none md:px-inset-lg">
         <Outlet />
       </main>
       {DevRoleSwitcher && (

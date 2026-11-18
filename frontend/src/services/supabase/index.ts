@@ -3,10 +3,26 @@ import type { ProfileRow, StudyLandingInfo, StudyRow } from '@contract/database.
 import { RPC, TABLES } from '@contract/database.types';
 import { NotImplemented } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
+import type { SignInInput, SignUpInput } from '@/services/types';
 
 /** The signed-in user's profile, or null when signed out (A3). Waits on backend auth (A2). */
 export async function getCurrentProfile(): Promise<ProfileRow | null> {
   throw new NotImplemented('getCurrentProfile');
+}
+
+/** A1. Waits on backend auth. */
+export async function signUp(_input: SignUpInput): Promise<ProfileRow> {
+  throw new NotImplemented('signUp');
+}
+
+/** A2. Waits on backend auth. */
+export async function signIn(_input: SignInInput): Promise<ProfileRow> {
+  throw new NotImplemented('signIn');
+}
+
+/** A2. Waits on backend auth. */
+export async function signOut(): Promise<void> {
+  throw new NotImplemented('signOut');
 }
 
 export async function getStudyBySourceCode(code: string): Promise<StudyLandingInfo | null> {

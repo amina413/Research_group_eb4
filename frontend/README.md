@@ -65,9 +65,11 @@ Switching a feature to the real backend = implement its file in
 
 ## Contract gaps
 
-Things the study landing page design (Figma 69-1190, 69-1452) shows but
-`get_study_by_source_code` doesn't return. Left out of `/join/:code` until the
-contract covers them — raise each as a contract change.
+Things the designs or pages need that the contract doesn't cover yet — raise
+each as a contract change. Unless the notes say otherwise, they were left out of
+the pages. The first four come from the
+study landing page (Figma 69-1190, 69-1452), which only gets data through
+`get_study_by_source_code`.
 
 | Gap | Priority | Notes |
 |---|---|---|
@@ -75,3 +77,5 @@ contract covers them — raise each as a contract change.
 | Researcher display name | — | "Run by [researcher name]". The RPC deliberately returns no researcher data. |
 | Maximum reward | — | "Earn up to [max reward]". No such field on `studies` or in the RPC. |
 | Recruitment closed date | — | "Recruitment closed on [date]". The RPC returns no date. |
+| Password reset (route + flow) | — | The log-in design (69-1309) has "Forgot password?", but the contract has no reset route or flow. Left out of `/login`. |
+| `?code=` on `/login` | — | Keeps source tracking for existing users. Already used by the frontend; needs adding to contract §7, which only lists `?code=` on `/register`. |
