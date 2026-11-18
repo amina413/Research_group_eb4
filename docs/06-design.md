@@ -1,5 +1,9 @@
 # 06 — Design (Figma)
 
+> **Note:** the Figma board is **greyscale wireframes**. The colours in the app
+> are **placeholders** until the designer delivers the final palette and visual
+> design. Use the colour tokens in `frontend/src/index.css`, never the hex values below.
+
 Source board: [Computing Group Project design board (Copy)](https://www.figma.com/design/mWsqFDfyAPnlwj1GMBjtd2/Computing-Group-Project-design-board--Copy-?node-id=0-1), page **Page 1** (`0:1`).
 
 Read from Figma via the Figma MCP on 2026-11-18.
