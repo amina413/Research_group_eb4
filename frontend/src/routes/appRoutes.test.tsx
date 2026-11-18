@@ -1,23 +1,8 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { ROUTES } from '@contract/routes'
-import { setMockSession, type MockSession } from '@/mocks/session'
-import { appRoutes } from './appRoutes'
-
-/** Render the real route tree at `path` with the given mock user signed in. */
-function renderAt(path: string, session: MockSession) {
-  setMockSession(session)
-  const router = createMemoryRouter(appRoutes, { initialEntries: [path] })
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  )
-  return router
-}
+import type { MockSession } from '@/mocks/session'
+import { renderAt } from '@/test/renderRoute'
 
 const heading = (name: string) => screen.findByRole('heading', { level: 1, name })
 
@@ -37,7 +22,7 @@ describe('role guards (A3)', () => {
 
     it('can still open public pages', async () => {
       renderAt(ROUTES.join('LIBPOST1'), 'signed_out')
-      expect(await heading('Join a study')).toBeInTheDocument()
+      expect(await heading('Daily Mood & Sleep Study')).toBeInTheDocument()
     })
   })
 
