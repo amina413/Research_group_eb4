@@ -62,3 +62,16 @@ Switching a feature to the real backend = implement its file in
 3. Register + onboarding questionnaire (`A1`, `C3`, `C4`)
 4. Participant dashboard (`D1`, `D3`, `D4`)
 5. Researcher: create study + QR codes (`B1`–`B4`)
+
+## Contract gaps
+
+Things the study landing page design (Figma 69-1190, 69-1452) shows but
+`get_study_by_source_code` doesn't return. Left out of `/join/:code` until the
+contract covers them — raise each as a contract change.
+
+| Gap | Priority | Notes |
+|---|---|---|
+| Data-use consent | **Must-have** | The design has an "I agree to my data being used" checkbox. Consent must be stored, and nothing in the contract holds it. |
+| Researcher display name | — | "Run by [researcher name]". The RPC deliberately returns no researcher data. |
+| Maximum reward | — | "Earn up to [max reward]". No such field on `studies` or in the RPC. |
+| Recruitment closed date | — | "Recruitment closed on [date]". The RPC returns no date. |

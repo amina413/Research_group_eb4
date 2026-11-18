@@ -1,0 +1,160 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+
+/*
+ * THEME TOKENS — the only place colours and sizes are defined.
+ * Components must use these tokens (bg-primary, text-body, h-input, rounded-sm …)
+ * and never hard-coded colours or px values.
+ *
+ * Layout values come from docs/06-design.md. The Figma screens are half-scale
+ * wireframes, so layout values are doubled; text uses a standard web scale that
+ * keeps the design's hierarchy instead of doubling.
+ */
+
+/* Light only for now: the design has no dark mode. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* ---------- Typography: Inter (06 §2) ---------- */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+
+  /* Figma px -> built px */
+  --text-helper: 0.875rem;          /*  9 -> 14  helper text */
+  --text-helper--line-height: 1.25rem;
+  --text-body: 1rem;                /* 10 -> 16  body, labels, buttons, nav, tables */
+  --text-body--line-height: 1.5rem;
+  --text-hero: 1.75rem;             /* 14 -> 28  landing hero heading */
+  --text-hero--line-height: 1.2;
+  --text-number: 2rem;              /* 16 -> 32  large numbers / stat values */
+  --text-number--line-height: 1.1;
+  --text-banner: 2.25rem;           /* 24 -> 36  success banner heading */
+  --text-banner--line-height: 1.2;
+  --text-progress: 2.5rem;              /* 20 -> 40  progress ring percentage */
+  --text-progress--line-height: 1;
+
+  /* ---------- Spacing / sizes (doubled from 06 §2) ----------
+   * General spacing uses Tailwind's 4px scale on an 8px rhythm:
+   * 2 / 4 / 6 / 8 / 12  =  8 / 16 / 24 / 32 / 48 px (Figma 4 / 8 / 12 / 16 / 24). */
+  --spacing-inset: 1rem;            /* 8-10 -> 16  screen side inset (mobile) */
+  --spacing-inset-lg: 1.25rem;      /* 8-10 -> 20  screen side inset (md and up) */
+  --spacing-nav: 3.25rem;           /* 26 -> 52  nav bar height */
+  --spacing-input: 3rem;            /* 24 -> 48  input / select height */
+  --spacing-button: 2.75rem;        /* 18-21 -> 44  button height (touch-target minimum) */
+  --spacing-mark: 2rem;             /* 15-16 -> 32  icons, field-error mark */
+  --spacing-progress: 11.25rem;         /* 90 -> 180  progress ring diameter */
+  --spacing-qr: 10rem;              /* not measured in 06; QR placeholder size */
+
+  --container-content: 64.5rem;     /* 516 -> 1032  max content width */
+
+  /* ---------- Radius (06 §2, doubled) ---------- */
+  --radius-none: 0;                 /*  0         nav, panels, cards, stat tiles */
+  --radius-sm: 0.5rem;              /*  4 -> 8    buttons, inputs, selects */
+  --radius-md: 0.625rem;            /*  5 -> 10   progress bars */
+  --radius-lg: 1.25rem;             /* 10 -> 20   dialogs */
+  --radius-xl: var(--radius-lg);
+  --radius-2xl: var(--radius-lg);
+  --radius-3xl: var(--radius-lg);
+  --radius-4xl: var(--radius-lg);
+
+  /* ---------- Colour token mapping (values live in :root) ---------- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+/*
+ * ============================================================
+ *  PLACEHOLDER — awaiting designer
+ * ============================================================
+ * The Figma board is greyscale wireframes. These colours are a neutral,
+ * accessible stand-in until the designer delivers the final palette.
+ * Replace the VALUES only; keep the token names.
+ *
+ * Contrast (WCAG 2.2) checked for every pair:
+ *   foreground / background ......... 16.7:1
+ *   primary-foreground / primary .... 16.7:1
+ *   secondary-fg / secondary ........ 13.2:1
+ *   accent-fg / accent .............. 14.2:1
+ *   muted-fg / muted ................  6.1:1  (6.7:1 on background)
+ *   success-fg / success ............  5.4:1
+ *   warning-fg / warning ............ 10.0:1
+ *   destructive-fg / destructive ....  6.5:1
+ *   border / background .............  4.5:1  (UI components need 3:1)
+ *   ring at 50% / background ........  3.3:1
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #1e1e1e;
+  --card: #ffffff;
+  --card-foreground: #1e1e1e;
+  --popover: #ffffff;
+  --popover-foreground: #1e1e1e;
+
+  --primary: #1e1e1e;
+  --primary-foreground: #ffffff;
+  --secondary: #e5e5e5;
+  --secondary-foreground: #1e1e1e;
+  --accent: #ededed;
+  --accent-foreground: #1e1e1e;
+  --muted: #f4f4f4;
+  --muted-foreground: #5c5c5c;
+
+  --success: #1b7a35;
+  --success-foreground: #ffffff;
+  --warning: #f2c230;
+  --warning-foreground: #1e1e1e;
+  --destructive: #b3261e;
+  --destructive-foreground: #ffffff;
+
+  --border: #767676;
+  --input: #767676;
+  --ring: #1e1e1e;
+
+  /* Chart series (Recharts) — greys until the designer picks a data palette */
+  --chart-1: #1e1e1e;
+  --chart-2: #5c5c5c;
+  --chart-3: #8a8a8a;
+  --chart-4: #b0b0b0;
+  --chart-5: #d4d4d4;
+}
+/* END PLACEHOLDER */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-body text-foreground;
+  }
+}
