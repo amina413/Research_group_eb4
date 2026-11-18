@@ -1,9 +1,5 @@
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
-import { ROUTES } from '@contract/routes'
-import App from '@/App'
-
-// The real route tree (role guards, pages) comes with the app-shell ticket (A3).
-const appRoutes: RouteObject[] = [{ path: ROUTES.home, element: <App /> }]
+import { appRoutes } from './appRoutes'
 
 async function loadDevRoutes(): Promise<RouteObject[]> {
   if (!import.meta.env.DEV) return []
@@ -13,5 +9,5 @@ async function loadDevRoutes(): Promise<RouteObject[]> {
 
 export async function createRouter() {
   const devRoutes = await loadDevRoutes()
-  return createBrowserRouter([...appRoutes, ...devRoutes])
+  return createBrowserRouter([...devRoutes, ...appRoutes])
 }

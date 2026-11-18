@@ -17,6 +17,7 @@ Framer Motion.
   instead of string literals.
 - Dev-only routes under /dev, registered only when import.meta.env.DEV is true,
   are exempt from the contract and must never be linked from app pages.
+- The `'*'` catch-all (not-found) route is allowed outside `ROUTES`.
 - Never calculate streak status, participation rate, points or levels in the UI.
   Display what `get_participation_summary` returns (rule R-P5).
 
@@ -32,11 +33,13 @@ Components → hooks (TanStack Query) → `src/services/index.ts` → either
 
 ## Folder guide
 - `src/app/` — providers (QueryClient, Router, Auth), app shell
-- `src/routes/` — route tree + role guards, paths from `@contract/routes`
+- `src/routes/` — route tree (guards live in `src/features/auth/guards.tsx`), paths from `@contract/routes`
 - `src/pages/{public,participant,researcher,admin}/` — one file per route
+- `src/pages/account/` — pages for any signed-in user, e.g. `/settings`
 - `src/features/<domain>/` — components, hooks and Zod schemas for one domain
 - `src/components/ui/` — shadcn/ui generated components (don't hand-edit heavily)
 - `src/components/{layout,shared}/` — app-wide components
+- `src/components/dev/` — dev-only tools, loaded only when `import.meta.env.DEV`
 - `src/services/` — data access (mock + supabase)
 - `src/lib/` — supabase client, utils, constants
 - `src/hooks/` — generic hooks not tied to a domain
