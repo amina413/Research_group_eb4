@@ -28,7 +28,7 @@ Priority uses MoSCoW: **M**ust, **S**hould, **C**ould, **W**on't (this time).
 | B4 | Download / print QR code | researcher | S | | qrcode.react |
 | B5 | Build the onboarding questionnaire | researcher | M | | `tasks` (`onboarding`), `task_questions` |
 | B6 | Build questionnaires, surveys and daily tasks | researcher | M | | `tasks`, `task_questions` |
-| B7 | Define milestone rewards per level | researcher | M | | `rewards` |
+| B7 | Define a reward per 10% milestone and the payment threshold (locked once published) | researcher | M | | `rewards`, `studies.payment_threshold_percent` |
 
 ## Epic C — Recruitment (participant + researcher)
 
@@ -47,14 +47,15 @@ Priority uses MoSCoW: **M**ust, **S**hould, **C**ould, **W**on't (this time).
 
 | ID | Feature | Role | Priority | User story | Contract refs |
 |---|---|---|---|---|---|
-| D1 | Dashboard: today's tasks, streak, level, points, next reward | participant | M | | `get_participation_summary`, `/participant` |
+| D1 | Dashboard: today's tasks, progress %, earnings, next milestone | participant | M | | `get_participation_summary`, `/participant` |
 | D2 | Complete a task / survey | participant | M | | `task_responses` |
-| D3 | 80% participation streak with grace period (see rules R-S*) | participant | M | | `streak_status` |
-| D4 | Levels from points | participant | M | | `current_level` |
-| D5 | Milestone rewards (vouchers → top reward: keep the device) | participant | M | | `rewards`, `reward_claims` |
-| D6 | Celebration on level-up / reward unlock | participant | C | | canvas-confetti |
+| D3 | Completion progress %: completed ÷ all progress-counting tasks (see rules R-M1–R-M3) | participant | M | | `completion_percent`, `completed_count`, `total_count` |
+| D4 | Milestone rewards every 10% above the payment threshold (see rules R-M4–R-M8) | participant | M | | `unlocked_milestones`, `next_milestone`, `earned_pence` |
+| D5 | Reward claims (vouchers → top reward at 100%: keep the device) | participant | M | | `rewards`, `reward_claims` |
+| D6 | Celebration when a milestone reward unlocks | participant | C | | canvas-confetti |
 | D7 | In-app notifications | participant | S | | `notifications` |
-| D8 | Email reminders (task due, grace period) | participant | S | | `send-email` |
+| D8 | Email reminders (task due, falling behind) | participant | S | | `send-email` |
+| D9 | Falling-behind warning when due tasks are missed (see rule R-M9) | participant | S | | `is_behind_schedule`, `falling_behind` |
 
 ## Epic E — Administration
 

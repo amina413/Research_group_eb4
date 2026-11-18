@@ -8,14 +8,14 @@ study participants and keep them engaged for the length of a long-term study.**
 Client scenario: Benjamin, a researcher at Monash University, struggles to (1) reach
 enough diverse participants and (2) stop them dropping out over weeks of data
 collection. The app tackles both: trackable recruitment links/QR codes, and a
-gamified participant experience (levels, a participation streak, milestone rewards).
+gamified participant experience (completion progress and a reward at every 10% milestone).
 
 ## Who uses it
 
 | Role | What they do |
 |---|---|
-| **Participant** | Finds a study via QR/link, signs up, completes onboarding, waits for approval, then completes daily tasks and surveys, earning points, levels and rewards. |
-| **Researcher** | Creates studies, generates QR codes per recruitment source, builds questionnaires/surveys/daily tasks, approves participants, defines rewards, watches recruitment and participation stats. |
+| **Participant** | Finds a study via QR/link, signs up, completes onboarding, waits for approval, then completes daily tasks and surveys, unlocking a reward at every 10% of the study completed (once past the payment threshold). |
+| **Researcher** | Creates studies, generates QR codes per recruitment source, builds questionnaires/surveys/daily tasks, approves participants, sets the payment threshold and a reward per 10% milestone, watches recruitment and participation stats. |
 | **Admin** | Oversees everything: all studies, all users, role changes, issue resolution. |
 
 ## The core journey
@@ -27,8 +27,8 @@ Participant scans QR ──► Landing page ──► Register ──► Onboard
                                         │
                          Researcher/admin approves (or rejects)
                                         │
-                     Participant dashboard: today's tasks, streak,
-                     level, points, next reward
+                     Participant dashboard: today's tasks, progress %,
+                     earnings, next milestone
                                         │
      Recruitment closes automatically when the target number is approved
 ```
@@ -70,8 +70,8 @@ frontend, Figma for designs.
 | Recruitment source | One trackable link/QR code for a study (e.g. "Library poster") |
 | Enrolment | A participant's application to / place in a study |
 | Task | Anything a participant fills in: onboarding, questionnaire, survey, daily task |
-| Participation rate | Completed required tasks ÷ expected required tasks over the streak window |
-| Streak | Whether the participant is keeping participation at or above 80% |
-| Grace period | Days after dropping below 80% where the streak is greyed out but not lost |
-| Level | Calculated from total points; unlocks rewards |
+| Completion % | Completed progress-counting tasks ÷ all progress-counting tasks scheduled for the participant (onboarding excluded); reaches 100% at study end |
+| Milestone | Every 10% of completion (10, 20 … 100). A study can set one reward per milestone; the 100% reward is keeping the device |
+| Payment threshold | Minimum completion % before any reward is earned (e.g. "Rewards start at 30%") |
+| Falling behind | The participant missed at least one due task in the last 3 days; they get a warning |
 | Contract | `docs/04-data-contract.md` + `/contract` — the agreed names FE and BE share |

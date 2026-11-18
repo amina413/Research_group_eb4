@@ -98,20 +98,25 @@ Link base: `https://www.figma.com/design/mWsqFDfyAPnlwj1GMBjtd2/Computing-Group-
 | `/admin/users` | No admin screens (E2, A6). |
 | `/settings` | Every nav bar has an "Account" button, but there's no settings / profile / delete-account screen (A4, A5). |
 
-**Features with no screen at all:** A4, A5, A6, B5, B6, C5, C8, D3, D4, D6, D7, D8, E1–E4.
+**Features with no screen at all:** A4, A5, A6, B5, B6, C5, C8, D6, D7, D8, D9, E1–E4.
+(D3 progress % and D4 milestones are covered by the participant study dashboard
+frames `69-1814` and `69-1300`.)
 
 **Design vs contract differences (for the team to resolve, not changed here)**
 
-- The design rewards **% completion with £ steps every 10%** above a payment
-  threshold. The contract and features use **points, levels and an 80% streak**
-  (D3, D4, `streak_status`, `current_level`). No screen shows a streak, level or points.
+- **Resolved (contract change 2026-11-18, `contract/reward-model`):** the reward
+  model now follows the design: **% completion with a reward every 10%** above a
+  payment threshold (`studies.payment_threshold_percent`, `rewards.completion_percent`,
+  `rewards.amount_pence`, rules R-M1–R-M9). The points, levels and 80% streak model
+  has been removed.
 - The daily check-in collects device, sleep hours, average heart rate and steps.
   `task_questions` can model this (`single_choice`, `number`, `yes_no`), but there's no fixed check-in shape.
 - The eligibility form asks for age band, gender and location, and the study
   dashboard shows **quota progress** by those fields. There are no quota columns in `studies`.
 - "Set up a study" has fields that aren't in `studies`: closing date for new
-  participants, minimum participants, maximum reward (£) and payment threshold.
-  It also has a **Save as draft** button.
+  participants and minimum participants. (Payment threshold is now
+  `studies.payment_threshold_percent`; maximum reward isn't stored, it's the sum
+  of the study's `rewards.amount_pence`.) It also has a **Save as draft** button.
 - Participant home has a **join-by-code** input (e.g. `ABCDEF-12`). The contract
   only has `/join/:code` (8-char code) and `get_study_by_source_code`.
 - The study landing page has a data-consent checkbox. No consent column exists.
@@ -238,6 +243,6 @@ None of these are Figma components. They're repeated groups of shapes, and the
 | **Confirmation dialog** | `grey-600` box, radius 10, notice pill, summary list, Go back / Publish buttons | Publish: confirmation |
 | **Empty state** | Card with a message ("You haven't created any studies yet.") and actions | Active studies (empty), Participant home: empty |
 | **Hero + step cards** | Heading, two role buttons, three "Step N" cards | Landing page |
-| **Streak badge** | **Not in the design.** There are no streak, level or points elements (see the differences above). | — |
+| **Falling-behind warning** | **Not in the design.** D9 needs a warning on the participant dashboard when `is_behind_schedule` is true (rule R-M9). | — |
 
 Designer annotations (numbered 20 px circles and arrows) are notes, not UI.

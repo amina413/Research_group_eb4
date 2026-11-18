@@ -1,8 +1,8 @@
 # Participant Recruitment & Retention App
 
 Web app for affective computing researchers to recruit diverse study participants
-(trackable QR codes/links) and keep them engaged over long studies (80% participation
-streak, levels, milestone rewards).
+(trackable QR codes/links) and keep them engaged over long studies (completion
+progress and a reward at every 10% milestone).
 
 ## Repo layout
 
